@@ -1,4 +1,4 @@
-ARG JAVA_VERSION=8
+ARG JAVA_VERSION=11
 
 # Build stage
 FROM mcr.microsoft.com/azure-functions/java:4-java$JAVA_VERSION-build AS installer-env
@@ -28,7 +28,20 @@ RUN chmod +r /etc/profile && \
     chmod 755 /azure-functions-host/start.sh
 
 # Grant read permissions to the host folder /azure-functions-host
-RUN chmod -R o+r /azure-functions-host
+RUN chmod -R 755 /azure-functions-host
+
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+   AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
+   AzureFunctionsJobHost__FileWatchingEnabled=false \
+   AzureFunctionsJobHost__Logging__FileLoggingMode=Never \
+   AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
+   AzureWebJobsFeatureFlags=EnableWorkerIndexing
+
+RUN mkdir -p ${AzureWebJobsScriptRoot} && \
+   chown -R nonroot:nonroot ${AzureWebJobsScriptRoot} && \
+   chown -R nonroot:nonroot /azure-functions-host && \
+   chown -R nonroot:nonroot /home
+
 
 # Ensure SSH configuration allows root login
 RUN sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \

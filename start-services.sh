@@ -2,12 +2,11 @@
 
 # Start SSH service
 echo "Docker!" | su -c "service ssh start"
-#service ssh start
 
 export DOTNET_USE_POLLING_FILE_WATCHER=true
 
 if [ -z "$PORT" ]; then
-  export ASPNETCORE_URLS=http://*:80
+  export ASPNETCORE_URLS=http://*:8080
 else
   export ASPNETCORE_URLS=http://*:$PORT
 fi
